@@ -13,4 +13,15 @@ public class MainController {
     public String index() {
         return "index";
     }
+
+    /*
+    root메서드를 추가하고, " / " URL를 매핑했음.
+    redirect:/question/list는 /question/list URL로 페이지를 리다이렉트 하라는 명령어이다.
+    - redirect:<URL>  => URL로 리다이렉트(완전히 새로운 URL로 요청)
+    - forward:<URL>   => URL로 포워드(기존 요청 값들이 유지된 채로 URL이 전환)
+     */
+    @GetMapping("/")
+    public String root() {
+        return "redirect:/question/list";
+    }
 }
