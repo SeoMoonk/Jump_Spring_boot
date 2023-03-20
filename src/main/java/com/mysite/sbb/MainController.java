@@ -1,4 +1,4 @@
-package com.mysite.sbb.Controller;
+package com.mysite.sbb;
 
 
 import org.springframework.stereotype.Controller;
