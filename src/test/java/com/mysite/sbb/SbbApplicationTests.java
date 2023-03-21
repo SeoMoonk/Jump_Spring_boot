@@ -5,6 +5,8 @@ import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.answer.AnswerRepository;
 import com.mysite.sbb.question.QuestionRepository;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,30 +32,71 @@ class SbbApplicationTests {
 	//@Autowired 애너테이션은 스프링의 DI 기능으로 questionRepository 객체를 스프링이 자동으로 생성해 준다.
 	@Autowired
 	private QuestionRepository questionRepository;
+	//테스트 환경에서는 리포지터리를 이용한 통신만 가능하다.
 
 	@Autowired
 	private AnswerRepository answerRepository;
 
-	//객체 생성
+
+//	@BeforeEach
+//		// 아래 메서드는 각 테스트케이스가 실행되기 전에 실행된다.
+//	void beforeEach() {
+//		// 모든 데이터 삭제
+//		questionRepository.deleteAll();
+//
+//		// 흔적삭제(다음번 INSERT 때 id가 1번으로 설정되도록)
+//		questionRepository.clearAutoIncrement();
+//
+//		// 질문 1개 생성
+//		Question q1 = new Question();
+//		q1.setSubject("sbb가 무엇인가요?");
+//		q1.setContent("sbb에 대해서 알고 싶습니다.");
+//		q1.setCreateDate(LocalDateTime.now());
+//		questionRepository.save(q1);  // 첫번째 질문 저장
+//
+//		// 질문 1개 생성
+//		Question q2 = new Question();
+//		q2.setSubject("스프링부트 모델 질문입니다.");
+//		q2.setContent("id는 자동으로 생성되나요?");
+//		q2.setCreateDate(LocalDateTime.now());
+//		questionRepository.save(q2);  // 두번째 질문 저장
+//
+//		// 모든 데이터 삭제
+//		answerRepository.deleteAll();
+//
+//		// 흔적삭제(다음번 INSERT 때 id가 1번으로 설정되도록)
+//		answerRepository.clearAutoIncrement();
+//	}
+
+
+	@DisplayName("질문 객체 생성")
 	@Test
 	void testJpa1() {
 
-		//q1, q2라는 Question 엔티티 객체를 생성하고, QuestionRepository 를 이용하여 그 값을 데이터베이스에 저장하는 코드.
-
+		// q라는 Question 엔티티 객체를 생성하고, QuestionRepository 를 이용하여 그 값을 데이터베이스에 저장하는 코드.
+		// 질문 1개 생성
 		Question q1 = new Question();
 		q1.setSubject("sbb가 무엇인가요?");
 		q1.setContent("sbb에 대해서 알고 싶습니다.");
 		q1.setCreateDate(LocalDateTime.now());
-		this.questionRepository.save(q1);  // 첫번째 질문 저장
+		questionRepository.save(q1);  // 첫번째 질문 저장
 
+		// 질문 1개 생성
 		Question q2 = new Question();
 		q2.setSubject("스프링부트 모델 질문입니다.");
 		q2.setContent("id는 자동으로 생성되나요?");
 		q2.setCreateDate(LocalDateTime.now());
-		this.questionRepository.save(q2);  // 두번째 질문 저장
+		questionRepository.save(q2);  // 두번째 질문 저장
+
+		assertEquals("sbb가 무엇인가요?", questionRepository.findById(1).get().getSubject());
 	}
 
-	//전부 조회하기
+
+	 /*
+    SQL
+    SELECT * FROM question
+    */
+	 @DisplayName("전부 조회하기")
 	@Test
 	void testJpa2() {
 		List<Question> all = this.questionRepository.findAll();		//findAll 은 데이터를 모두 조회할때 사용하는 메서드이다.
@@ -63,7 +106,14 @@ class SbbApplicationTests {
 		assertEquals("sbb가 무엇인가요?", q.getSubject());		//첫번째 데이터(index=0) 의 getSubject 값이 기대값과 일치한다면 통과.
 	}
 
-	//ID로 검색하기
+
+	/*
+    SQL
+    SELECT *
+    FROM question
+    WHERE id = 1
+    */
+	@DisplayName("ID로 검색하기")
 	@Test
 	void testJpa3() {
 
@@ -77,7 +127,15 @@ class SbbApplicationTests {
 		}
 	}
 
-	//제목으로 검색하기
+
+
+	/*
+    SQL
+    SELECT *
+    FROM question
+    WHERE subject = 'sbb가 무엇인가요?'
+    */
+	@DisplayName("제목으로 검색하기")
 	@Test
 	void testJpa4() {
 		Question q = this.questionRepository.findBySubject("sbb가 무엇인가요?");
@@ -85,7 +143,16 @@ class SbbApplicationTests {
 
 	}
 
-	//AND 검색하기
+
+
+	/*
+    SQL
+    SELECT *
+    FROM question
+    WHERE subject = 'sbb가 무엇인가요?'
+    AND content = 'sbb에 대해서 알고 싶습니다.'
+    */
+	@DisplayName("AND (제목 + 내용) 검색하기")
 	@Test
 	void testJpa5() {
 		Question q = this.questionRepository.findBySubjectAndContent("sbb가 무엇인가요?", "sbb에 대해서 알고 싶습니다.");
@@ -93,7 +160,15 @@ class SbbApplicationTests {
 	}
 
 
-	//LIKE 검색하기
+
+	/*
+    SQL
+    SELECT *
+    FROM question
+    WHERE subject LIKE 'sbb%'
+    */
+	//LIKE (sbb%) 검색하기
+	@DisplayName("LIKE_(sbb%) 검색하기")
 	@Test
 	void testJpa6() {
 		/*
@@ -108,29 +183,54 @@ class SbbApplicationTests {
 	}
 
 
-	//데이터 수정하기
-//	@Test
-//	void testJpa7() {
-//		Optional<Question> oq = this.questionRepository.findById(1);		//id가 1인 객체를 repos에서 가져와서 저장.
-//		assertTrue(oq.isPresent());		//Optional 객체가 값을 가지고 있다면 true, 값이 없다면 false 리턴
-//		Question q = oq.get();			//가져온 id가 1인 객체를 q에 대입.
-//		q.setSubject("수정된 제목");		//제목을 수정.
-//		this.questionRepository.save(q);	//수정된 내용을 저장.
-//	}
 
-	//데이터 삭제하기
-//	@Test
-//	void testJpa8() {
-//		assertEquals(2, this.questionRepository.count());		//현재 객체에 있는 데이터의 총 갯수가 기대치와 일치하는가?
-//		Optional<Question> oq = this.questionRepository.findById(1);	//id가 1번인 내용을 가져옴.
-//		assertTrue(oq.isPresent());		//객체에 내용 잘 들어갔지? (값 존재 하지?)
-//		Question q = oq.get();			//내용 대입
-//		this.questionRepository.delete(q);		//내용 삭제
-//		assertEquals(1, this.questionRepository.count());		//전에서 1개 삭제되었는데, 갯수가 일치 하는가?
-//	}
 
-	//답변 생성 후 저장하기
+	/*
+    SQL
+    UPDATE
+        question
+    SET
+        content = ?,
+        create_date = ?,
+        subject = ?
+    WHERE
+        id = ?
+    */
+
+	@DisplayName("데이터 수정하기")
 	@Test
+	void testJpa7() {
+		Optional<Question> oq = this.questionRepository.findById(1);		//id가 1인 객체를 repos에서 가져와서 저장.
+		assertTrue(oq.isPresent());		//Optional 객체가 값을 가지고 있다면 true, 값이 없다면 false 리턴
+		Question q = oq.get();			//가져온 id가 1인 객체를 q에 대입.
+		q.setSubject("수정된 제목");		//제목을 수정.
+		this.questionRepository.save(q);	//수정된 내용을 저장.
+	}
+
+
+
+	/*
+    SQL
+    DELETE
+    FROM
+        question
+    WHERE
+        id = ?
+    */
+	@DisplayName("데이터 삭제하기")
+	@Test
+	void testJpa8() {
+		assertEquals(2, this.questionRepository.count());		//현재 객체에 있는 데이터의 총 갯수가 기대치와 일치하는가?
+		Optional<Question> oq = this.questionRepository.findById(1);	//id가 1번인 내용을 가져옴.
+		assertTrue(oq.isPresent());		//객체에 내용 잘 들어갔지? (값 존재 하지?)
+		Question q = oq.get();			//내용 대입
+		this.questionRepository.delete(q);		//내용 삭제
+		assertEquals(1, this.questionRepository.count());		//전에서 1개 삭제되었는데, 갯수가 일치 하는가?
+	}
+
+
+	@Test
+	@DisplayName("답변 생성 후 저장하기")
 	void testJpa9() {
 		Optional<Question> oq = this.questionRepository.findById(2);	//id가 2인 내용을 가져온다.
 		assertTrue(oq.isPresent());			//id가 2인 내용을 잘 가져왔는가? (null 이 아닌거 맞지?)
@@ -143,8 +243,8 @@ class SbbApplicationTests {
 		this.answerRepository.save(a);		//답변 저장
 	}
 
-	//답변 조회하기
 	@Test
+	@DisplayName("답변 조회하기")
 	void testJpa10() {
 		//해당 Answer 의 아이디는 1이지만, Answer 과 Question 이 서로 연결되있도록 했기 때문에
 		//1번 Answer 에 대한 내용이 아이디가 2인 Question 에 대한 답변이다 라는 것까지 얻어서 확인할 수 있음.

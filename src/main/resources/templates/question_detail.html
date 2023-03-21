@@ -1,0 +1,22 @@
+
+<!-- Q Controller 의 detail 메서드에서 Model 객체에 "question" 이라는 이름으로
+ Question 객체를 저장했으므로 사용되는 템플릿 구성. -->
+<h1 th:text="${question.subject}"></h1>
+<div th:text="${question.content}"></div>
+
+<!-- 질문에 등록된 답변을 상세 화면에 표시 -->
+<h5 th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
+<div>
+    <ul>
+        <li th:each="answer : ${question.answerList}" th:text="${answer.content}"></li>
+    </ul>
+</div>
+
+<!-- 답변 등록 버튼 추가
+ 답변등록 버튼을 누르면 전송되는 form 의 action 은 타임리프의 "th:action" 속성으로 생성할 수 있다.
+ <답변등록> 버튼을 누르면 POST 방식으로 /answer/create/<질문 id> URL 이 호출(submit) 된다.
+ -->
+<form th:action="@{|/answer/create/${question.id}|}" method="post">
+    <textarea name="content" id="content" rows="15"></textarea>
+    <input type="submit" value="답변등록">
+</form>
