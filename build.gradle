@@ -34,6 +34,9 @@ dependencies {
 	//thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+	//화면에서 전달받은 입력 값을 검증하기 위함(비어있는 값으로 질문이 등록되지 않도록) => Spring Boot Validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {
