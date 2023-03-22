@@ -1,6 +1,8 @@
 package com.mysite.sbb.question;
 
 import com.mysite.sbb.question.Question;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -46,7 +48,11 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     List<Question> findBySubjectLike(String subject);
 
+    //Pageable 객체를 입력으로 받아 Page<Question> 타입 객체를 리턴하는 findAll 메서드
+    Page<Question> findAll(Pageable pageable);
 
+
+    //id 자동증가 내역 삭제
     @Query(value = "ALTER TABLE answer AUTO_INCREMENT = 1", nativeQuery = true)
     void clearAutoIncrement();
 

@@ -21,7 +21,7 @@
 
             2-07 자주 사용하는 타임리프의 속성 살펴보기.
             -->
-            <tr th:each="question, loop : ${questionList}">
+            <tr th:each="question, loop : ${paging}">
                 <!-- 이 코드는 바로 앞의 for 문에서 얻은 question 객체의 제목을 <td> 엘리먼트의 텍스트로 출력한다.-->
 
                 <!-- 제목을 <td> 엘리먼트의 텍스틀로 출력하던 것에서 링크로 변경했다.
@@ -39,6 +39,35 @@
             </tr>
         </tbody>
     </table>
+    <!-- 페이징처리 시작 -->
+    <div th:if="${!paging.isEmpty()}">
+        <ul class="pagination justify-content-center">
+            <!-- 타임리프의 th:classappend="조건식 ? 클래스값" 속성은 조건식이 참인 경우 클래스값을 class 속성에 추가한다.-->
+           <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
+                    <!-- 이전 페이지가 없는 경우에는 "이전" 링크가 비활성화(disabled)-->
+                <a class="page-link"
+                   th:href="@{|?page=${paging.number-1}|}">
+                    <span>이전</span>
+                </a>
+            </li>
+            <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+                th:if="${page >= paging.number-5 and page <= paging.number+5}"
+                th:classappend="${page == paging.number} ? 'active'"
+                class="page-item">
+                <!-- 페이지 리스트를 루프 돌면서 해당 페이지로 이동할 수 있는 링크를 생성
+                +) 현재 페이지를 기준으로 좌 우 5개의 페이지 이동만 보여지도록 설정
+                이때 루프 도중의 페이지가 현재 페이지와 같을 경우에는 active클래스를 적용하여 강조표시 -->
+                <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
+            </li>
+            <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
+                <!-- 다음 페이지가 없는 경우에는 "다음" 링크가 비활성화(disabled)-->
+                <a class="page-link" th:href="@{|?page=${paging.number+1}|}">
+                    <span>다음</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- 페이징처리 끝 -->
     <a th:href="@{/question/create}" class="btn btn-primary">질문 등록하기</a>    <!-- question/create 로 이어지는 버튼 추가 -->
 </div>
 </html>

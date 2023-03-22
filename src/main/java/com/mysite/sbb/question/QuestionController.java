@@ -3,6 +3,7 @@ package com.mysite.sbb.question;
 import com.mysite.sbb.answer.AnswerForm;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -36,19 +37,33 @@ public class QuestionController {
 
 
     //(Controller -> Service -> Repository)
+    //페이징으로 대체됨.
+//    @GetMapping("/list")
+//    public String list(Model model) {
+//
+//        /*
+//        QuestionRepository의 findAll 메서드를 사용하여 질문 목록 데이터인 quetionList를 생성하고,
+//        Model 객체에 "questionList" 라는 이름으로 값을 저장. (Model 객체는 자바 클래스와 템플리 간의 연결고리 역할을 한다.)
+//        Model 객체에 값을 담아두면 템플릿에서 그 값을 사용할 수 있다.
+//        Model 객체는 따로 생성할 필요 없이 컨트롤러 메서드의 매개변수로 지정하기만 하면
+//        SpringBoot가 자동으로 Model 객체를 생성한다.
+//        */
+//        List<Question> questionList = this.questionService.getList();
+//
+//        model.addAttribute("questionList", questionList);
+//        return "question_list";
+//    }
+
+    //GET 방식으로 요청된 URL 에서 page 값을 가져오기 위해
+    //@RequestParam(value="page", defaultValue="0") int page 매개변수가 list 메서드에 추가 (default 는 0)
     @GetMapping("/list")
-    public String list(Model model) {
+    public String list(Model model, @RequestParam(value="page", defaultValue ="0") int page)
+    {
+        Page<Question> paging = this.questionService.getList(page);
 
-        /*
-        QuestionRepository의 findAll 메서드를 사용하여 질문 목록 데이터인 quetionList를 생성하고,
-        Model 객체에 "questionList" 라는 이름으로 값을 저장. (Model 객체는 자바 클래스와 템플리 간의 연결고리 역할을 한다.)
-        Model 객체에 값을 담아두면 템플릿에서 그 값을 사용할 수 있다.
-        Model 객체는 따로 생성할 필요 없이 컨트롤러 메서드의 매개변수로 지정하기만 하면
-        SpringBoot가 자동으로 Model 객체를 생성한다.
-        */
-        List<Question> questionList = this.questionService.getList();
+        //템플릿에 Page<Question> 객체인 paging 을 전달.
+        model.addAttribute("paging", paging);
 
-        model.addAttribute("questionList", questionList);
         return "question_list";
     }
 

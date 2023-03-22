@@ -4,6 +4,7 @@ import com.mysite.sbb.question.Question;
 import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.answer.AnswerRepository;
 import com.mysite.sbb.question.QuestionRepository;
+import com.mysite.sbb.question.QuestionService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,6 +37,9 @@ class SbbApplicationTests {
 
 	@Autowired
 	private AnswerRepository answerRepository;
+
+	@Autowired
+	private QuestionService questionService;
 
 
 //	@BeforeEach
@@ -273,6 +277,7 @@ class SbbApplicationTests {
 
 	@Transactional	//이 애너테이션을 사용하면 메서드가 종료될 때까지 DB 세션이 유지되어 실행 가능해짐.
 	@Test
+	@DisplayName("답변 조회하기2")
 	void testJpa11() {
 		Optional<Question> oq = this.questionRepository.findById(2);
 		assertTrue(oq.isPresent());
@@ -282,5 +287,16 @@ class SbbApplicationTests {
 
 		assertEquals(1, answerList.size());
 		assertEquals("네 자동으로 생성됩니다.", answerList.get(0).getContent());
+	}
+
+	@Test
+	@DisplayName("테스트데이터 생성")
+	void testJpa12() {
+		for(int i=1; i<=50; i++)
+		{
+			String subject = String.format("테스트 데이터 입니다. : [%03d]", i);
+			String content = "내용 x";
+			this.questionService.create(subject, content);
+		}
 	}
 }

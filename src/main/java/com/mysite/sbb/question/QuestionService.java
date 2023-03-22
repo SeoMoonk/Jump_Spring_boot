@@ -31,10 +31,15 @@ package com.mysite.sbb.question;
  */
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.mysite.sbb.DataNotFoundException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,9 +52,10 @@ public class QuestionService {
 
 
     //질문 목록을 조회하여 리턴하는 getList 메서드. (컨트롤러에서 리포지터리를 사용하던 것 옮겨온 것)
-    public List<Question> getList() {
-        return this.questionRepository.findAll();
-    }
+    //페이징 도입하면서 대체됨.
+//    public List<Question> getList() {
+//        return this.questionRepository.findAll();
+//    }
 
     //데이터의 실제 제목과 내용을 출력
     public Question getQuestion(Integer id)
@@ -74,5 +80,17 @@ public class QuestionService {
         q.setContent(content);
         q.setCreateDate(LocalDateTime.now());
         this.questionRepository.save(q);
+    }
+
+    //getList 메서드는 정수 타입의 페이지번호를 입력받아 해당 페이지의 질문 목록을 리턴하는 메서드로 변경
+    public Page<Question> getList(int page)
+    {
+        //가장 최근에 작성한 게시물이 가장 먼저 보이도록. (원래는 등록한 순서대로 였음.)
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createDate"));
+
+        //page => 조회할 페이지의 번호, 10 => 한 페이지에 보여줄 게시물의 갯수.
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+        return this.questionRepository.findAll(pageable);
     }
 }
