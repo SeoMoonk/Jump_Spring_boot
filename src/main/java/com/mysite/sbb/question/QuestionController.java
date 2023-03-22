@@ -27,12 +27,12 @@ public class QuestionController {
     //생성자 방식으로, DI(Dependency Injection) 규칙에 의해 "의존성이 주입" 된다.
     private final QuestionService questionService;
 
-    //template에 question_list.html을 추가함으롤써 ResponseBody 어노테이션은 필요 없어지고,
+/*    //template에 question_list.html을 추가함으롤써 ResponseBody 어노테이션은 필요 없어지고,
     //html 파일의 내용으로 return 이 대체 되어지게된다.
     @GetMapping("/old_list")
     public String list_old() {
         return "old_question_list";
-    }
+    }*/
 
 
     //(Controller -> Service -> Repository)
@@ -97,7 +97,7 @@ public class QuestionController {
         }
 
         this.questionService.create(questionForm.getSubject(), questionForm.getContent());
-        return "redirect:/question/list";       //질문 저장 후 질문 목록으로 이동
+        return "redirect:/question/list";      //질문 저장 후 질문 목록으로 이동
     }
 
 }
