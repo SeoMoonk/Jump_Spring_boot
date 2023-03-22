@@ -1,0 +1,10 @@
+
+/* 텍스트 창의 넓이를 100%로. */
+textarea {
+    width:100%;
+}
+
+/* 답변등록 버튼에 10px의 마진 설정 */
+input[type=submit] {
+    margin-top:10px;
+}
