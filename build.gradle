@@ -37,6 +37,10 @@ dependencies {
 
 	//화면에서 전달받은 입력 값을 검증하기 위함(비어있는 값으로 질문이 등록되지 않도록) => Spring Boot Validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	//스프링 시큐리티와 이와 관련된 타임리프 라이브러리
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
 }
 
 tasks.named('test') {
