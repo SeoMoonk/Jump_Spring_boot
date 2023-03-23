@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration           //스프링의 환경설정 파일임을 의미
@@ -27,8 +28,15 @@ public class SecurityConfig {
         http.authorizeHttpRequests().requestMatchers(
                 new AntPathRequestMatcher("/**")).permitAll()
                 .and()
-                .csrf().ignoringRequestMatchers(
-                        new AntPathRequestMatcher("/maria-db/**"));
+                    .csrf().ignoringRequestMatchers(
+                            new AntPathRequestMatcher("/maria-db/**"))
+                .and()
+                    .headers()
+                    .addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
+                .and()  //스프링 시큐리티의 로그인 설정을 담당하는 부분으로, 로그인 페이지의 URL은 다음과 같고, 성공시엔 root 로 이동한다
+                    .formLogin()
+                    .loginPage("/user/login")
+                    .defaultSuccessUrl("/");
                 //스프링 시큐리티가 CSRF 처리시 maria db는 예외로 처리할 수 있도록 수정.
 
         return http.build();
