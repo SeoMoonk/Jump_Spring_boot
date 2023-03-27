@@ -3,6 +3,8 @@ package com.mysite.sbb;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,8 +38,17 @@ public class SecurityConfig {
                 .and()  //스프링 시큐리티의 로그인 설정을 담당하는 부분으로, 로그인 페이지의 URL은 다음과 같고, 성공시엔 root 로 이동한다
                     .formLogin()
                     .loginPage("/user/login")
-                    .defaultSuccessUrl("/");
+                    .defaultSuccessUrl("/")
                 //스프링 시큐리티가 CSRF 처리시 maria db는 예외로 처리할 수 있도록 수정.
+
+                .and()
+                    .logout()
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
+                    .logoutSuccessUrl("/")           //로그아웃이 성공하면 루트로 돌아가도록 함.
+                    .invalidateHttpSession(true)
+                    //로그아웃시 생성된 사용자 세션도 삭제하도록 처리.
+                ;
+
 
         return http.build();
     }
@@ -45,5 +56,17 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+
+
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+
+        //스프링 시큐리티의 인증을 담당한다.
+        //AuthenticationManager 빈 생성시 스프링의 내부 동작으로 인해
+        //위에서 작성한 UserSecurityService 와 PasswordEncoder 가 자동으로 설정된다.
+
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }
