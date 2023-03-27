@@ -95,4 +95,15 @@ public class QuestionService {
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
         return this.questionRepository.findAll(pageable);
     }
+
+    //어떤 질문인지, 어떤 제목인지, 어떤 내용인지를 가지고 질문 서비스에서 수정을 수행.
+    public void modify(Question question, String subject, String content)
+    {
+        question.setSubject(subject);
+        question.setContent(content);
+        question.setModifyDate(LocalDateTime.now());
+
+        this.questionRepository.save(question);
+    }
+
 }

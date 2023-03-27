@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+
 @Getter
 @Setter
 @Entity
@@ -30,5 +31,6 @@ public class Answer {
     @ManyToOne
     private SiteUser author;
 
+    private LocalDateTime modifyDate;
 
 }

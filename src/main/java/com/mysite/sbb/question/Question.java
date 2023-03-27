@@ -42,6 +42,9 @@ public class Question {
     @ManyToOne
     private SiteUser author;
 
+    //수정일시
+    private LocalDateTime modifyDate;
+
     public void addAnswer(Answer a) {
         a.setQuestion(this);
         answerList.add(a);

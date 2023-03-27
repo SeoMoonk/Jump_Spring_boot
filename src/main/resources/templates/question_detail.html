@@ -2,7 +2,7 @@
 왜냐하면 static 디렉터리가 스태틱 파일들의 루트 디렉터리이기 때문이다.
 <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">  -->
 <html layout:decorate="~{layout}">
-    <div layout:fragment="content" class="container my-3">
+    <div layout:fragment="content" class="container my-3" xmlns:sec>
         <!-- 질문 -->
         <h2 class="border-bottom py-2" th:text="${question.subject}"></h2>
         <div class="card my-3">
@@ -15,6 +15,15 @@
                         </div>
                         <div th:text="${#temporals.format(question.createDate, 'yyyy-MM-dd HH:mm')}"></div>
                     </div>
+                </div>
+                <div class="my-3">
+                    <!--로그인한 사용자와 글쓴이가 동일한 경우에만 수정하기 버튼이 노출되도록-->
+                    <!--#authentication.getPrincipal().getUsername() == question.author.username 을 적용하였다.-->
+                    <!-- #authentication.getPrincipal()은 Principal 객체를 리턴하는 타임리프의 유틸리티이다. -->
+                    <a th:href="@{|/question/modify/${question.id}|}" class="btn btn-sm btn-outline-secondary"
+                       sec:authorize="isAuthenticated()"
+                       th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
+                       th:text="수정"></a>
                 </div>
             </div>
         </div>
