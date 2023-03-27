@@ -6,7 +6,8 @@
         <thead class="table-dark">
         <tr>
             <th>번호</th>
-            <th>제목</th>
+            <th style="width:50%">제목</th>
+            <th>글쓴이</th>
             <th>작성일시</th>
         </tr>
         </thead>
@@ -21,12 +22,12 @@
 
             2-07 자주 사용하는 타임리프의 속성 살펴보기.
             -->
-            <tr th:each="question, loop : ${paging}">
+            <tr class="text-center" th:each="question, loop : ${paging}">
 
                     <!-- 게시물 번호 = 전체 게시물 개수 - (현재 페이지 * 페이지당 게시물 개수) - 나열 인덱스-->
                 <td th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>
 
-                <td>
+                <td class="text-start">
 
                     <!-- 제목을 <td> 엘리먼트의 텍스트로 출력하던 것에서 링크로 변경했다.
                     타임리프에서 링크의 주소는 th:href 속성을 사용한다. 타임리프에서 th:href 처럼 URL 주소를 나타낼 때는 반드시
@@ -41,6 +42,7 @@
                     <!-- 답변이 있는지 조사하고, 답변 개수를 표시함 -->
 
                 </td>
+                <td><span th:if="${question.author != null}" th:text="${question.author.username}"></span></td>
                 <td th:text="${#temporals.format(question.createDate, 'yyyy-MM-dd HH:mm')}"></td>
                                                     <!-- 날짜 객체를 포맷에 맞게 변환 -->
             </tr>
