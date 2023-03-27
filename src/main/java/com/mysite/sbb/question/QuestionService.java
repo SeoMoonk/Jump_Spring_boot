@@ -106,4 +106,10 @@ public class QuestionService {
         this.questionRepository.save(question);
     }
 
+    //Question 객체를 입력으로 받아 Question 리포지터리를 사용하여 질문 데이터를 삭제하는 delete 메서드.
+    public void delete(Question question)
+    {
+        this.questionRepository.delete(question);
+    }
+
 }

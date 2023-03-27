@@ -23,10 +23,20 @@ layout.html 을 상속한 템플릿에서 개별적으로 구현해야 하는 �
 <body>
 <!-- 네비게이션 바 -->
 <nav th:replace="~{navbar :: navbarFragment}"></nav>
+
 <!-- 기본 템플릿 안에 삽입될 내용 Start -->
 <th:block layout:fragment="content"></th:block>
 <!-- 기본 템플릿 안에 삽입될 내용 End -->
-<!-- Bootstrap JS -->
+
+<!-- Bootstrap JS Start -->
 <script th:src="@{/bootstrap.min.js}"></script>
+<!-- Bootstrap JS End -->
+
+<!-- 자바스크립트 Start
+화면 렌더링이 완료된 후에 자바스크립트가 실행되기 때문에, 자바스크립트 코드는 최대한 바디의 끝에 가깝게
+작성하는것이 좋다, 화면 렌더링이 완료되지 않은 상태에서 JS를 실행하면 오류가 발생하거나, 로딩이 지연될 수 있다. -->
+<th:block layout:fragment="script"></th:block>
+<!-- 자바스크립트 END-->
+
 </body>
 </html>

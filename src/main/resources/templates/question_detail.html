@@ -1,7 +1,7 @@
 <!-- static 디렉터리에 style.css 파일이 위치하지만 /static/style.css 대신 /style.css 로 사용해야 함에 주의하자.
 왜냐하면 static 디렉터리가 스태틱 파일들의 루트 디렉터리이기 때문이다.
 <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">  -->
-<html layout:decorate="~{layout}">
+<html layout:decorate="~{layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
     <div layout:fragment="content" class="container my-3" xmlns:sec>
         <!-- 질문 -->
         <h2 class="border-bottom py-2" th:text="${question.subject}"></h2>
@@ -24,6 +24,19 @@
                        sec:authorize="isAuthenticated()"
                        th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
                        th:text="수정"></a>
+
+                    <!-- 삭제 버튼은 수정 버튼과는 다릴 href 속성값을 javascript:void(0)로 설정했다. 그리고 삭제를 실행할
+                    URL 을 얻기 위해 th:data-uri 속성을 추가하고(url 아님), 삭제 버튼이 눌리는 이벤트를 확인할 수 있도록
+                    class 속성에 "delete" 항목을 추가해 주었다.
+                    (data-uri 속성은 자바스크립트에서 클릭 이벤트 발생시 this.dataset.uri 와 같이 사용하여 그 값을 얻을 수 있다.)
+
+                    href 에 삭제 URL 을 직접 사용하지 않고 이러한 방식을 사용한 이유는 삭제 버튼을 클릭했을 때
+                    "정말로 삭제하시겠습니까?" 와 같은 확인 절차가 필요하기 때문이다.  -->
+                    <a href="javascript:void(0);" th:data-uri="@{|/question/delete/${question.id}|}"
+                       class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
+                       th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
+                       th:text="삭제"></a>
+
                 </div>
             </div>
         </div>
@@ -54,28 +67,20 @@
             <input type="submit" value="답변등록" class="btn btn-primary my-2">
         </form>
     </div>
+
+    <!-- 삭제 버튼을 눌렀을때 확인 창을 호출하기 위한 자바스크립트 코드.
+    delete 라는 클래스를 포함하는 컴포넌트(버튼이나 링크)를 클릭하면 "정말로 삭제하시겠습니까?"
+    라는 질문을 하고, "확인"을 선택할 경우 해당 컴포넌트의 data-uri 값으로 URL 호출을 하라는 의미이다. -->
+    <script layout:fragment="script" type='text/javascript'>
+        const delete_elements = document.getElementsByClassName("delete");
+        Array.from(delete_elements).forEach(function(element) {
+            element.addEventListener('click', function() {
+                if(confirm("정말로 삭제하시겠습니까?")) {
+                    location.href = this.dataset.uri;
+                };
+            });
+        });
+    </script>
+
+
 </html>
-
-<!--
-
-&lt;!&ndash; Q Controller 의 detail 메서드에서 Model 객체에 "question" 이라는 이름으로
- Question 객체를 저장했으므로 사용되는 템플릿 구성. &ndash;&gt;
-<h1 th:text="${question.subject}"></h1>
-<div th:text="${question.content}"></div>
-
-&lt;!&ndash; 질문에 등록된 답변을 상세 화면에 표시 &ndash;&gt;
-<h5 th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
-<div>
-    <ul>
-        <li th:each="answer : ${question.answerList}" th:text="${answer.content}"></li>
-    </ul>
-</div>
-
-&lt;!&ndash; 답변 등록 버튼 추가
- 답변등록 버튼을 누르면 전송되는 form 의 action 은 타임리프의 "th:action" 속성으로 생성할 수 있다.
- <답변등록> 버튼을 누르면 POST 방식으로 /answer/create/<질문 id> URL 이 호출(submit) 된다.
- &ndash;&gt;
-<form th:action="@{|/answer/create/${question.id}|}" method="post">
-    <textarea name="content" id="content" rows="15"></textarea>
-    <input type="submit" value="답변등록">
-</form>-->
