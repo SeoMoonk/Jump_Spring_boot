@@ -7,14 +7,13 @@ import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 
@@ -59,5 +58,45 @@ public class AnswerController {
 
         this.answerService.create(question, answerForm.getContent(), siteUser);
         return String.format("redirect:/question/detail/%s", id);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/modify/{id}")
+    public String answerModify(AnswerForm answerForm, @PathVariable("id") Integer id, Principal principal)
+    {
+        //URL 의 답변 아이디를 통해 조회한 답변 데이터의 내용을 AnswerForm 객체에 대입하여
+        //answer_form.html 템플릿에서 사용할 수 있도록 하였다.
+        Answer answer = this.answerService.getAnswer(id);
+
+        if(!answer.getAuthor().getUsername().equals(principal.getName()))
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+        }
+
+        //답변 수정 시 기존의 내용이 필요하므로 AnswerForm 객체에 조회한 값을 저장해야 한다.
+        answerForm.setContent(answer.getContent());
+
+        //answer_form.html 은 답변을 수정하기 위한 템플릿으로 신규로 작성해야 한다.
+        return "answer_form";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/modify/{id}")
+    public String answerModify(@Valid AnswerForm answerForm, BindingResult bindingResult, @PathVariable("id") Integer id,
+                               Principal principal)
+    {
+        if(bindingResult.hasErrors())
+        {
+            return "answer_form";
+        }
+        Answer answer = this.answerService.getAnswer(id);
+
+        if(!answer.getAuthor().getUsername().equals(principal.getName()))
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
+        }
+        this.answerService.modify(answer, answerForm.getContent());
+
+        return String.format("redirect:/question/detail/%s", answer.getQuestion().getId());
     }
 }
