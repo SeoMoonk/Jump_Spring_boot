@@ -30,6 +30,7 @@ package com.mysite.sbb.question;
     -> 단, 이 책에서는 그냥 그대로 사용함. (실제로는 DTO를 권장)
  */
 
+import com.mysite.sbb.user.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -73,12 +74,13 @@ public class QuestionService {
 
 
     //컨트롤러에서 명령을 받으면 서비스가 질문을 생성하고, 리포지토리에 저장함.
-    public void create(String subject, String content)
+    public void create(String subject, String content, SiteUser user)
     {
         Question q = new Question();
         q.setSubject(subject);
         q.setContent(content);
         q.setCreateDate(LocalDateTime.now());
+        q.setAuthor(user);
         this.questionRepository.save(q);
     }
 

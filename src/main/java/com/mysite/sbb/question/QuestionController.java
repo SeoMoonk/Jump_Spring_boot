@@ -1,14 +1,18 @@
 package com.mysite.sbb.question;
 
 import com.mysite.sbb.answer.AnswerForm;
+import com.mysite.sbb.user.SiteUser;
+import com.mysite.sbb.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 /*
@@ -35,6 +39,8 @@ public class QuestionController {
         return "old_question_list";
     }*/
 
+
+    private final UserService userService;
 
     //(Controller -> Service -> Repository)
     //페이징으로 대체됨.
@@ -91,6 +97,7 @@ public class QuestionController {
     왜냐하면 question_form.html 템플릿은 "질문 등록하기" 버튼을 통해 GET 방식으로 요청되더라도
     th:object 에 의해 QuestionForm 객체가 필요하기 때문이다.
     */
+    @PreAuthorize("isAuthenticated()")      //로그인 했을 경우에만 가능
     @GetMapping(value = "/create")
     public String questionCreate(QuestionForm questionForm) {
         return "question_form";
@@ -102,16 +109,17 @@ public class QuestionController {
     // QuestionForm 의 subject, content 속성이 자동으로 바인딩 된다. (스프링의 바인딩 기능)
     // @Valid => @NotEmpty, @Size 등의 Form 검증 애노테이션이 동작.
     // @BindingResult => @Valid 로 인해 검증이 수행된 결과를 의미하는 객체. (항상 Valid 와 함께 사용되어야 함.)
+    @PreAuthorize("isAuthenticated()")      //로그인 했을 경우에만 가능
     @PostMapping(value = "/create")
-    public String questionCreate(@Valid QuestionForm questionForm, BindingResult bindingResult)
+    public String questionCreate(@Valid QuestionForm questionForm, BindingResult bindingResult, Principal principal)
     {
         //입력이 잘못되었을 경우(비어있을 경우 등) => 다시 폼을 작성하는 화면으로 이어지도록.
         if(bindingResult.hasErrors())
         {
             return "question_form";
         }
-
-        this.questionService.create(questionForm.getSubject(), questionForm.getContent());
+        SiteUser siteUser = this.userService.getUser(principal.getName());
+        this.questionService.create(questionForm.getSubject(), questionForm.getContent(), siteUser);
         return "redirect:/question/list";      //질문 저장 후 질문 목록으로 이동
     }
 

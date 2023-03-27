@@ -2,6 +2,7 @@ package com.mysite.sbb.question;
 
 
 import com.mysite.sbb.answer.Answer;
+import com.mysite.sbb.user.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,6 +38,9 @@ public class Question {
     //cascade = CacadeType.REMOVE ==> 질문에는 여러 답변일 달릴 수 있는데, 질문이 삭제되면 여러 답변 또한 함께 삭제되어야 하기에 지정.
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     private List<Answer> answerList;
+
+    @ManyToOne
+    private SiteUser author;
 
     public void addAnswer(Answer a) {
         a.setQuestion(this);

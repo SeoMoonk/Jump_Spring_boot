@@ -2,6 +2,7 @@ package com.mysite.sbb.answer;
 
 
 import com.mysite.sbb.question.Question;
+import com.mysite.sbb.user.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +17,13 @@ public class AnswerService {
 
 
     //답변 생성 (입력으로 받은 question과 content를 사용하여 Answer 객체를 생성하여 저장.)
-    public void create(Question question, String content)
+    public void create(Question question, String content, SiteUser author)
     {
         Answer answer = new Answer();
         answer.setContent(content);
         answer.setCreateDate(LocalDateTime.now());
         answer.setQuestion(question);
+        answer.setAuthor(author);
         this.answerRepository.save(answer);
     }
 
