@@ -66,13 +66,19 @@ public class QuestionController {
     //GET 방식으로 요청된 URL 에서 page 값을 가져오기 위해
     //@RequestParam(value="page", defaultValue="0") int page 매개변수가 list 메서드에 추가 (default 는 0)
     @GetMapping("/list")
-    public String list(Model model, @RequestParam(value="page", defaultValue ="0") int page)
-    {
-        Page<Question> paging = this.questionService.getList(page);
+    public String list(Model model, @RequestParam(value="page", defaultValue ="0") int page,
+                       @RequestParam(value = "kw", defaultValue = "") String kw)
+    {                           //검색어에 해당하는 kw 파라미터를 추가하고, 디폴트 값으로 빈 문자열을 설정함.
+
+        Page<Question> paging = this.questionService.getList(page, kw);
 
         //템플릿에 Page<Question> 객체인 paging 을 전달.
         model.addAttribute("paging", paging);
 
+        //화면에서 입력한 검색어를 화면에 유지하기 위해 kw 값을 저장.
+        model.addAttribute("kw", kw);
+
+        //kw 값이 파라미터로 들어오면 해당 값으로 질문 목록이 검색되어 조회됨.
         return "question_list";
     }
 

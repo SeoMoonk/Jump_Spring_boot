@@ -30,12 +30,15 @@ package com.mysite.sbb.question;
     -> 단, 이 책에서는 그냥 그대로 사용함. (실제로는 DTO를 권장)
  */
 
+import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.user.SiteUser;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import com.mysite.sbb.DataNotFoundException;
 
@@ -85,7 +88,7 @@ public class QuestionService {
     }
 
     //getList 메서드는 정수 타입의 페이지번호를 입력받아 해당 페이지의 질문 목록을 리턴하는 메서드로 변경
-    public Page<Question> getList(int page)
+    public Page<Question> getList(int page, String kw)
     {
         //가장 최근에 작성한 게시물이 가장 먼저 보이도록. (원래는 등록한 순서대로 였음.)
         List<Sort.Order> sorts = new ArrayList<>();
@@ -93,7 +96,8 @@ public class QuestionService {
 
         //page => 조회할 페이지의 번호, 10 => 한 페이지에 보여줄 게시물의 갯수.
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-        return this.questionRepository.findAll(pageable);
+        Specification<Question> spec = search(kw);
+        return this.questionRepository.findAll(spec, pageable);
     }
 
     //어떤 질문인지, 어떤 제목인지, 어떤 내용인지를 가지고 질문 서비스에서 수정을 수행.
@@ -116,6 +120,38 @@ public class QuestionService {
     public void vote(Question question, SiteUser siteUser) {
         question.getVoter().add(siteUser);
         this.questionRepository.save(question);
+    }
+
+    private Specification<Question> search(String kw)
+    {
+        return new Specification<>() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            public Predicate toPredicate(Root<Question> q, CriteriaQuery<?> query, CriteriaBuilder cb)
+            {
+                // q -> Root, 즉 기준을 의미하는 Question 엔티티의 객체(검색을 위해 필요)
+
+                query.distinct(true);
+
+                Join<Question, SiteUser> u1 = q.join("author", JoinType.LEFT);
+                //Question 엔티티와 SiteUser 엔티티를 아우터 조인 하여 만든 SiteUser 엔티티의 객체.
+                // (둘은 author 으로 이어져있기 때문에 q.join("author")와 같이 조인해야함. (질문 작성자 검색)
+
+                Join<Question, Answer> a = q.join("answerList", JoinType.LEFT);
+                //Question 엔티티와 Answer 엔티티는 answerList 속성으로 연결되어 있어
+                //q.join("answerList")로 조인함. (답변 내용 검색)
+
+                Join<Answer, SiteUser> u2 = a.join("author", JoinType.LEFT);
+                //위의 a 객체와 다시 한번 SiteUser 엔티티와 아우터 조인하여 만든 SiteUser 엔티티의 객체. (답변 작성자 검색)
+
+                //LIKE 검색
+                return cb.or(cb.like(q.get("subject"), "%" + kw + "%"), // 제목
+                        cb.like(q.get("content"), "%" + kw + "%"),      // 내용
+                        cb.like(u1.get("username"), "%" + kw + "%"),    // 질문 작성자
+                        cb.like(a.get("content"), "%" + kw + "%"),      // 답변 내용
+                        cb.like(u2.get("username"), "%" + kw + "%"));   // 답변 작성자
+            }
+        };
     }
 
 }
