@@ -21,6 +21,14 @@
                     </div>
                 </div>
                 <div class="my-3">
+                    <!-- 수정 버튼 옆에 추천 버튼을 추가, 추천 수도 함께 보이도록 함.
+                     버튼을 클릭하면 href 속성이 javascript:void(0)으로 되어있어 아무 동작도 하지 않는다.
+                     하지만 class 속성에 "recommend"를 추가하여 자바스크립트로 data-uri 에 정의된
+                     URL 이 호출되도록 할 것임. (추천 버튼을 눌렀을 때 확인창을 통해 확인을 구하기 위해 이런 방법을 사용함.)-->
+                    <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+                       th:data-uri="@{|/question/vote/${question.id}|}">추천
+                        <span class="badge rounded-pill bg-success" th:text="${#lists.size(question.voter)}"></span>
+                    </a>
                     <!--로그인한 사용자와 글쓴이가 동일한 경우에만 수정하기 버튼이 노출되도록-->
                     <!--#authentication.getPrincipal().getUsername() == question.author.username 을 적용하였다.-->
                     <!-- #authentication.getPrincipal()은 Principal 객체를 리턴하는 타임리프의 유틸리티이다. -->
@@ -64,6 +72,10 @@
                     </div>
                 </div>
                 <div class="my-3">
+                    <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+                       th:data-uri="@{|/answer/vote/${answer.id}|}"> 추천
+                        <span class="badge rounded-pill bg-success" th:text="${#lists.size(answer.voter)}"></span>
+                    </a>
                     <a th:href="@{|/answer/modify/${answer.id}|}" class="btn btn-sm btn-outline-secondary"
                        sec:authorize="isAuthenticated()"
                        th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
@@ -98,7 +110,15 @@
                 };
             });
         });
+        // 추천 버튼에 class="recommend"가 적용되어 있으므로 추천 버튼을 클릭하면 확인 문구가
+        // 나타나고 확인 선택시 data-uri 속성에 정의한 URL 이 호출될 것이다
+        const recommend_elements = document.getElementsByClassName("recommend");
+        Array.from(recommend_elements).forEach(function(element) {
+            element.addEventListener('click', function() {
+                if(confirm("정말로 추천하시겠습니까?")) {
+                    location.href = this.dataset.uri;
+                };
+            });
+        });
     </script>
-
-
 </html>

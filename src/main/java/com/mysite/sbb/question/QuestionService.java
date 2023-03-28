@@ -112,4 +112,10 @@ public class QuestionService {
         this.questionRepository.delete(question);
     }
 
+    //Question 엔티티에 사용자를 추천인으로 지정하는 vote 메서드
+    public void vote(Question question, SiteUser siteUser) {
+        question.getVoter().add(siteUser);
+        this.questionRepository.save(question);
+    }
+
 }

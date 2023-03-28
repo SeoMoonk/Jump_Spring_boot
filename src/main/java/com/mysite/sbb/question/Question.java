@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter     //엔티티에는 Setter 메서드를 구현하지 않고 사용하는게 좋다.(DB와 바로 연결된 상태인데 Setter를 허용하면 변경이 너무 자유로워짐.)
@@ -41,6 +42,14 @@ public class Question {
 
     @ManyToOne
     private SiteUser author;
+
+    //하나의 질문에 여러 사람이 추천할 수 있고, 한 사람이 여러개의 질문을 추천할 수 있다.
+    //이처럼 추천인은 부모와 자식의 관계가 아니라 대등한 관계이기 때문에 @ManyToMany 를 사용한다.
+    //List 가 아닌 Set 으로 한 이유는 추천인은 중복되면 안되기 때문(Set 은 중복을 허용하지 않는 자료형)
+    //ManyToMany 관계로 속성을 생성하면, ★새로운 테이블을 생성★ 하여 데이터를 관리하게 된다.
+    //테이블에는 서로 연관된 엔티티의 고유 번호(id) 2개가 PK 로 되어있어 다대다(N:N) 관계가 성립한다.
+    @ManyToMany
+    Set<SiteUser> voter;
 
     //수정일시
     private LocalDateTime modifyDate;
