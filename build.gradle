@@ -41,6 +41,9 @@ dependencies {
 	//스프링 시큐리티와 이와 관련된 타임리프 라이브러리
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
+
+	//마크다운 문법
+	implementation 'org.commonmark:commonmark:0.21.0'
 }
 
 tasks.named('test') {
