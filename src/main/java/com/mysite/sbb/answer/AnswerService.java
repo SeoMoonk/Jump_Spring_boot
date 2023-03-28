@@ -19,7 +19,7 @@ public class AnswerService {
 
 
     //답변 생성 (입력으로 받은 question과 content를 사용하여 Answer 객체를 생성하여 저장.)
-    public void create(Question question, String content, SiteUser author)
+    public Answer create(Question question, String content, SiteUser author)
     {
         Answer answer = new Answer();
         answer.setContent(content);
@@ -27,6 +27,8 @@ public class AnswerService {
         answer.setQuestion(question);
         answer.setAuthor(author);
         this.answerRepository.save(answer);
+
+        return answer;
     }
 
     public Answer getAnswer(Integer id)
